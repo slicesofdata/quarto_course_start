@@ -1,0 +1,143 @@
+project:
+  type: website
+  output-dir: docs
+  preview:
+    port: 166
+    browser: true
+    navigate: true
+  render:
+    - "*.qmd"
+    - "!omit/"                              # do not build anything in /omit
+    - "!data/building"                      # do not build anything here
+    - "!content_"                           # do not build anything here
+    - "!modules/module_starter_page.qmd"
+    #- "!modules/01_installing_r_and_rstudio.qmd"
+#    - "!modules/" # Note regarding !, if try to render with an ignore, will get ERROR: TypeError: Cannot convert undefined or null to object
+#    - "!slides/"
+
+website:
+  title: "**PSYC166**"
+  navbar:
+    left:
+      - text: "**Home**"
+        file: index.qmd
+      - text: "**Syllabus**"
+        file: syllabus/syllabus.qmd
+      #- text: "Textbook"
+      #  href: https://psyteachr.github.io/ads-v2
+      - text: "**Modules**"
+        file: modules/index.qmd
+      - text: "**Project**"
+        file: project/index.qmd                            # will reference subdirs
+
+################################################################################
+##    Slides may not be able to be set with _ starting name
+      - text: "**Slides**"
+        menu:
+        - text: Example 1
+          href: slides/sample_quarto_presentation.qmd
+################################################################################
+      #- text: "**Readings**"
+      #  href: readings/readings.qmd
+
+################################################################################
+      - text: "**Homework**"
+        # file: homework/index.qmd         # this quarto file is not used - files referenced separately
+        menu:
+          - text: HW 1
+            href: homework/HW01.Rmd
+#          - text: HW 2
+#            href: homework/HW02.Rmd
+#          - text: HW 3
+#            href: homework/HW03.Rmd
+#          - text: HW 4
+#            href: homework/HW04.Rmd
+#          - text: HW 5
+#            href: homework/HW05.Rmd
+#          - text: HW 6
+#            href: homework/HW06.Rmd
+#          - text: HW 7
+#            file: homework/HW07.Rmd
+#          - text: HW 8
+#            href: homework/HW08.Rmd
+#          - text: HW 9
+#            href: homework/HW09.Rmd
+      #    - text: HW 10
+      #      href: "https://raw.githubusercontent.com/slicesofdata/fods24/main/homework/HW10.Rmd")
+################################################################################
+
+      - text: "**Data**"
+        # file: data/index.qmd         # this quarto file is not used
+        menu:
+          - text: cms-top-all-time-2023-swim.xlsx
+            href: https://github.com/slicesofdata/dataviz23/raw/main/data/cms-top-all-time-2023-swim.zip
+          - text: Fun Tidy Tuesday Data Sets
+            href: https://github.com/rfordatascience/tidytuesday
+
+################################################################################
+      - text: "**Cheatsheets**"
+        #file: cheatsheets/index.qmd     # this quarto file is not used
+        menu:
+          - text: RMarkdown
+            href: cheatsheets/rmarkdown-2.0.pdf
+          - text: 'Data Wrangling with {dplyr} and {tidyr}'
+            href: https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
+          - text: Quarto (Publish and Share)
+            href: https://rstudio.github.io/cheatsheets/html/quarto.html
+          - text: 'String Manipulation with {stringr}'
+            href: https://rstudio.github.io/cheatsheets/html/strings.html
+          - text: 'Reading and Writing Data with {readr}'
+            href: https://rstudio.github.io/cheatsheets/html/data-import.html
+          - text: Data Science with RWorkflow
+            href: cheatsheets/Data_Science_With_R_Workflow.pdf
+          - text: More Cheatsheets Here
+            href: https://rstudio.github.io/cheatsheets/
+          - text: Quarto Cheat Sheet (what Quarto Files Look Like)
+            href: https://images.datacamp.com/image/upload/v1676540721/Marketing/Blog/Quarto_Cheat_Sheet.pdf
+################################################################################
+      - text: "**Other Tools**"
+        href: resources/tools.qmd
+################################################################################
+# on the right of the page
+    right:
+      - icon: github
+        href: https://github.com/slicesofdata/fods24
+        aria-label: GitHub
+################################################################################
+# to add a topic sidebar
+  sidebar:
+      #style: "floating"
+      #collapse-level: 2
+      #align: left
+      #contents: auto
+    - title: "Home"
+      style: "floating"
+      collapse-level: 2
+      align: left
+      contents:
+        - syllabus/syllabus.qmd
+        - auto: modules
+        - auto: project
+
+    - title: "Slides"
+      style: "floating"
+      collapse-level: 2
+      align: left
+
+################################################################################
+
+format:
+  html:
+    theme: css/styles.scss
+    css: [css/nav.css,css/styles.css]
+    toc: true
+    include-in-header: "css/fontawesome.html"
+    #mainfont: arial #Nunito
+    fontsize: 1.1rem # 1.2rem
+#    linkcolor: "#096980"
+#    monofont: courier new
+
+#css: css/styles.scss
+
+editor: source
+

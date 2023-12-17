@@ -1,0 +1,17 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.Rprofile
+
+/.quarto/
+_content/
+_R/
+omit/
+notes/
+exercises/
+homework/key
+
+*.RData
+*.rdb
+*.rdx

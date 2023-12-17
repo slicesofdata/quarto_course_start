@@ -1,0 +1,274 @@
+---
+title: "**Installing and Setting Up Git and GitHub for R**"
+author: "Gabriel I. Cook"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+
+execute:
+  enabled: true
+---
+
+```{r}
+#| label: load-packages
+#| include: false
+# see other examples for reverting changes
+#https://jennybc.github.io/2014-05-12-ubc/ubc-r/session03_git.html
+```
+
+## **Overview**
+
+We will perform all the necessary tasks for using Git with RStudio and managing files at the remote repository at GitHub. 
+
+### **Steps of the Task**
+
+1. Create a GitHub account
+2. Install Git
+3. Configure Git for R, within R (a familiar context)
+4. Create a Personal Access Token (PAT)
+5. Set your Git Credentials (using PAT) 
+6. Create a Version Control Project in RStudio (for your team project)
+7. Make file edits, stage the, and commit them
+8. Push commits to GitHub
+
+## **Libraries Used** 
+
+- **{usethis}**: `r packageVersion("usethis")`: for project workflow automation 
+- **{gitcreds}**: `r packageVersion("gitcreds")`: for querying git credentials
+
+
+## **Why Go Through the Trouble?**
+
+Projects are rarely done without collaboration. Teams collaborate, leveraging team members' work and accomplishments. Using R in conjunction with the a distributed version control system, like Git, will facilitate that collaboration process. Writing flexible R code that does not hard-code objects will allow your research project to be reproducible, for example, when variables and data change (e.g., new data added, a new year added, etc.). Git long with GitHub will allow you to track your edits (the version control) and share your code with your collaborators or interested scholars.
+
+Some reasons to use version control are:
+
+- Facilitates project sharing (once it’s setup, you’ll get there)
+- Facilitates collaboration. Others can also report errors or suggest features to your project.
+- Makes reverting back to previous states easy. You can easily revert back to a previous version of your code in the event you discover errors or you delete critical details accidentally. 
+- Serves as a memory for edits when memory fails. All changes across different versions of your code or written content is available.  
+
+RStudio integrates support for Git but this interface is a little clunky. You can use it but RStudio also allows for communication via the command line *Terminal*, which will be the preferred method shared here.
+
+
+
+## **Installing Git**
+
+1. Do I need to install Git?
+
+     * Mac OS Users can check if already install by typing git `--version` at the Mac Terminal. If a version number is returned, then Git is installed.
+
+     * Windows Users can press the Windows key (or click the Start button) and type Git in the search bar. If you see Git or GitBash listed, then Git is installed.
+
+2. Download and Install Git (if necessary)
+
+     * Mac OS Users may experience problems with instructions listed at the [Git download site](https://git-scm.com/downloads) to install Homebrew and set the PATH variable. Instead, I recommend downloading the [binary version here](https://sourceforge.net/projects/git-osx-installer/) and download it to install.
+     * Windows Users can download the latest version of [Git here](https://git-scm.com/download/win). Download and install Git, making a note of where on your computer you are install it as you may need to locate the path for RStudio, especially if you use a portable version of Git.
+
+
+## **Creating a GitHub Account**
+
+1. Go to [GitHub](https://github.com/) and create a free GitHub account. Make note of your username and your associated e-mail as you will need those for configuring Git with R.
+     * Consider this brief 15-minute [TryGit Tutorial](https://try.github.io/).
+
+2. Stay logged in so that you can complete a later step.
+
+3. Send your PM your GitHub username. Your PM will send those to me and I will add you to a private repo. Once you are added to the repo, you can do the next step.
+
+
+## **Checking Git Setup in RStudio**
+
+You will need to tell RStudio where to find the Git program as this may not be recognize automatically.
+
+1. Find the path to the Git program executable that was installed in an earlier step.
+     * In the *Terminal* in RStudio (not the R console), type: `where git` on Windows or `which git` on Mac/Linux and you might find the path easily. If there are more than one paths listed, just make note of one of them. 
+     * If for some reason you don't see a path listed using that approach, type:  `Sys.which("git")` in your R console. The path here will likely be truncated so you will have to fill in the gaps when performing the step to set the path.
+     
+2. In RStudio, go to **Tools > Global Options** and click on left side bar menu item *Git/SVN*.
+
+2. Select the option at the top to *Enable version control interface for RStudio projects* if it is not selected.
+
+3. Set the path to the Git executable if it is not already there. Browse to the path to where Git.exe installed on your computer. Windows Users should make note that this path should be a path containing `Git.exe` and **not** a path containing `git-bash.exe`.
+
+4. Click *Apply* and click *OK*.
+
+ 
+ 
+## **Configuring Git and GitHub**
+
+There are two ways you can set up, either using R (console) or the command line (terminal). My recommendation is to use R because that is where you are likely most familiar. We will use the **{usethis}** library to help you.
+
+The **{usethis}** library will make connecting your `R` project to your github account simple. This library should be installed as part of the packages from the start of the course. You will use `usethis::use_git_config()` to configure your GitHub account  (see earlier) with Git on your computer. In the below example, you need to pass two arguments, your `user.name` and `user.email` attached to your GitHub account and then execute the modified `R` code:
+
+```
+usethis::use_git_config(user.name = "Jane Git", 
+                        user.email = "jane_git@gitrdone.com")
+```
+
+
+## **Creating a Personal Access Token (PAT) for GitHub**
+
+You will need a personal access token for making remote changes to GitHub. 
+
+Execute the following `R` to create a token.
+
+```
+usethis::create_github_token()
+```
+
+After executing the code, you will be taken to your GitHub account (if you remained logged in). Go to the bottom of the page and click *generate token*. **Copy it** to the clipboard and **save it someplace safe**. Do not share your token with anyone because anyone who has it can access your public or private GitHub repositories. 
+
+   Note: Your PAT will expire after some duration, usually 30 days unless you change it. For this project, I suggest you change the expiration to a date after the semester ends. 
+
+
+## **Setting your Git Credentials (using PAT)**
+
+We now need to set those credentials for RStudio to communicate with your GitHub account.
+
+Execute the following `R` code to set your credentials:
+
+```
+gitcreds::gitcreds_set()
+```
+
+You will then paste your PAT here and press return/enter. If there are options, enter the number corresponding to the one that makes the more sense for what you are doing, like set or replace your credentials.
+
+  
+
+## **Creating a Version Control Project in RStudio**
+
+1. In RStudio, **File > New Project > Version Control > Git**. 
+
+2. In the pop-up, you will see a request for the "repository URL". Paste the URL of the GitHub repository based on your liaison name. This URL will be the same as what you see on your GitHub account. However, we need to add `.git` to the end.
+
+```
+    https://github.com/slicesofdata/dataviz23-stewart.git
+    https://github.com/slicesofdata/dataviz23-venglass.git
+    https://github.com/slicesofdata/dataviz23-lawson.git
+```
+
+3. When you create the project, a directory will be created, a name will auto populate (e.g., 'dataviz23-stewart'). If you change the name, name it something that you will know as your team project. In order to keep the class organized, I might suggest you create the project in your PSYC167 course directory. You should already have a R project for you homework called something like `homework.Rproj` in that course directory. *WARNING:* Do not create the project inside of an existing project's directory.
+
+    * Note: I recommend that you also select *"Open in new session"* in order to compartmentalize projects. When you work on the team project, open the project. When you work on your homework or other class exercises, open your *homework* project.
+
+4. Click *"Create Project"* to create the new project directory, which will create:
+     * a project directory on your computer
+     * a project file with file extension `.Rproj`
+     * a Git repository or link to the remote GitHub repository for the project (also an RStudio Project)
+ 
+If the repository already exists (and it does in this instance) you should see RStudio flash a connection to GitHub and likely *pull* the repo contents down to your newly-created project directory. You will see the directory structure and corresponding files. Your code files should be saved to `/r`, the data you read or save to `/data`, your RMarkdown report files to `/report`, etc. 
+
+These directories are there for project management purposes. Also, to maintain a clean project, create sub-directories within those directories as needed; create new directories *if and only if* its contents differ qualitatively from what is in the existing directories. Because the project report will need to be reproduced, don't complicate your code by creating RMarkdown files for code used to perform some task when only code is needed. In those cases, use `.R` code script files. Use `.Rmd` files only for a report containing text and minor code. You cannot easily `source()` `.Rmd` files and creating them will be a a hassle to deal with later. Project organization is an element of the project.
+
+
+## **Git Workflow Basics**
+
+There are three main parts to Git Workflow:
+
+- Make local changes (in your working directory) 
+- Stage changes (in your staging directory) 
+- Commit changes (to apply them for pushing to your remote repository)
+
+
+## **Making Local File Changes, Committing, and Pushing to GitHub**
+
+1. **Making a local change**
+     * Create a `.R` script and name it something like `yourname.R`. Save it to ... you guessed it: `/r`. 
+
+
+2. **Checking the status of local file changes**
+     * Check for the local changes you have made at the *Terminal* by typing `git status` and press return/enter
+        * `$ git status`
+     
+     *  If you made changes, Git will tell you what those changes are. For example, there will be a new file, a deleted file, a modified file, etc.
+
+3. **Staging Changes (Add Changes)**
+    a. *Stage a specific change*: If you made multiple changes and all you want to do is commit a single change and no others, you can specify the change you want to add. For example, if you want only to add a specific file, like `yourname.R`, you will use `git add <file>...` such that `<file>` refers to the file name.
+        * At the *Terminal* prompt, type `git add` followed by `<file>` to include in what will be committed)
+        * `$ git add r/yourname.R` 
+    b. *Stage all change(s)*: When you make numerous changes, you may wish not to specify each file individually as that could be tedious. In this case, you may wish to stage all of your changes. Assuming everything you are doing is relevant to the project, one of the easiest ways to add changes is to just add all of your file changes. Note, your changes should not be done inside data files (e.g., `.csv`, `.xlsx`). Changes should only be done using R code. If not, your project will not be reproducible. 
+        * At the *Terminal*, you can type `git add .` which tells Git that you are adding all of those changes to commit them.
+        * `$ git add .`
+
+4. **Committing the change(s)** 
+     * Now that you made a change, you will commit it and assign a useful message to remind your future self and collaborators what you just did. 
+        * At the *Terminal*, type `git commit` to commit the changes, add `-m` to tell git you want a message, and then type the message as a string, `"my message here"` and then press enter/return to commit the changes.
+        * `$ git commit -m "added my first .R file"`
+
+5. **Push the change to the remote repository**
+     * We need to push the changes to the remote GitHub repository for version control and for collaborators to access
+        * At the *Terminal*, you will push those changes using `git push` and press enter/return to push.
+        * `$ git push`
+     * If you navigate to your GitHub account in your web browser, you will see the changes there as soon as they arrive. Congrats!
+
+6. **Practice (Yes, seriously): Changing, Committing, and Pushing Again**
+     * You know that file with your name is not needed for the project. Delete it from the project as you normally would delete a file (no need to use the Terminal) and then *add* the change, *commit* the change with message "deleted my silly file", and *push* changes. 
+     * If for some reason, your push did not work, you may need to specify the project branch. Branching is beyond the scope of this course. If team members are working on separate tasks, their code will be compartmentalized so you can use the main branch.
+        * You can set the branch to the main branch at the *Terminal* using `git branch -M main`.
+        * `$ git branch -M main`
+
+7. **Pushing Specific File Changes**
+     * You should not push all of your edits. For example, if you edit a file and save it but it is incomplete (e.g., it contains errors) that will create problems for your team members, you do not want to push them to the repo. If you do, your team member's code will also break if they are sourcing (e.g., `source()`) your script file. Similarly, if the data file you write out contains errors, a teammate cannot read that file in successfully. So make sure that what you push is correct and accurate before pushing.
+
+8. **Pulling Changes from the Remote** 
+     * The opposite of push is pull. When your teammates push their changes (e.g., data cleaning, file creation, etc.) to the repo and your code depends on those files, you will want to make sure their edits are in your local project so that you can use them. 
+        * To pull the changes down to your project, at the *Terminal*, type `git pull`.
+        * `$ git pull`
+
+     * You should find the changes appear in your local project directory.
+
+
+
+## **Using the Git Tab in your RStudio Pane**
+
+If you do not use the Terminal to add, commit, and push, you can also use Git with RStudio, though I tend to find this creates an annoying lag when there are lots of files. 
+
+When you edit files (e.g., made changes and saved the file), the file will be detected in the project if you have set up Git. The changes detected will be listed in the window for this tab. You can then stage, commit the changes, push the changes using this RStudio GUI.
+
+1. Click the Git tab
+
+2. Check the box under *Staged* next to the file
+     * Note: There may be a delay.
+
+3. Click the *Commit* icon on the toolbar directly above *Status*
+     * A window will pop up showing some of the edits to the file
+     * A window for *Commit message* will also appear for adding your message. This window is where you want to be.
+     
+4. Type your commit message in that window
+     * Your message should be clear and useful to remind your future self or colleagues of the edits but not be overly wordy. 
+
+5. Click Commit to commit the change
+
+```{r include=FALSE}
+colFmt <- function(x,color) {
+  
+  outputFormat <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+  
+  if(outputFormat == 'latex') {
+    ret <- paste("\\textcolor{",color,"}{",x,"}",sep="")
+  } else if(outputFormat == 'html') {
+    ret <- paste("<font color='",color,"'>",x,"</font>",sep="")
+  } else {
+    ret <- x
+  }
+  
+  return(ret)
+}
+
+```
+
+6. Click the `r colFmt("Green", 'lime')` Arrow to *Push* your committed change *up* to the remote repository.
+
+Note: You will click the `r colFmt("Blue", 'blue')` Arrow to *Pull* the changes *down* from the remote repository what were pushed there by your collaborators
+
+
+## **Other Resources**
+
+
+1. Git Client: 
+
+Git clients work like the RStudio Gui option described above but likely much better. One client is [GitKraken](https://www.gitkraken.com/).
+     * If you find the *Terminal* command line daunting or limiting, I might recommend a Git Client to use as I am not a big fan of the RStudio interface.
+     * GitKraken is a good option and they have lots of tutorials on their website. GitKraken is seamless to set up. Install, connect your GitHub account, select your repo to add, and voilà. You can stage, commit, and push from there.  
+
+2. [happygitwithr](https://happygitwithr.com/)
+
+

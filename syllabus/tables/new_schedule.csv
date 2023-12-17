@@ -1,0 +1,28 @@
+Date,Week,Module,Topic
+29-Aug,1,1,Introduction & Project Management
+,1,2,Graphical Perception
+5-Sep,2,3,Data Frame Manipulation and Wrangling
+,2,4,Data Subsets and Summaries
+12-Sep,3,5,The Grammar of Graphics
+,3,6,Visualizing Amounts
+19-Sep,4,7,Visualizing Associations
+,4,8,Spatial Position and Adjustment
+26-Sep,5,9,Considerations in Data Visualization
+,5,10,Color Scales and Palettes
+3-Oct,6,11,Histograms and Density Plots
+,6,12,Coordinates Axes and Position Scales
+10-Oct,7,13,Statistical Transformations (Data as-is Versus Summaries)
+,7,14,More Data Wrangling
+17-Oct,8," ",<span style="color:#1EDAFB">Fall Break (no class)</span>
+24-Oct,9,15,Visualizing More Distributions
+,9,16,Visualizing Uncertainty
+31-Oct,10,,<span style="color:#8DFF0A">Mid-Term Presentation</span>
+7-Nov,11,17,Visualizing Trends
+,11,18,Legends and Arrangement
+14-Nov,12,19,Designing Perceptually Efficient Visualizations
+,12,20,Annotation and Text
+21-Nov,13,21,Multi-Panel Plots: Faceting and Layers
+,13,22,Attentional Control and Tradeoffs
+28-Nov,14,23,Titles Captions & Tables
+,14,24,Figure Design (Themes)
+5-Dec,15,,<span style="color:#8DFF0A">Presentation (Last day of Instruction)</span>

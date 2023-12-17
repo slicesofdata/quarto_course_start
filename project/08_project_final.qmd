@@ -1,0 +1,45 @@
+---
+title: "**Final presentation**"
+author: "Gabriel I. Cook"
+#date: "`r format(Sys.time(), '%d %B, %Y')`"
+
+execute:
+  enabled: true
+---
+
+
+
+# **Overview**
+
+The final written report for the project will be delivered to me and to your liaison. I can provide a color-printed copy for you to distrubtue to the liaison and for their offices. 
+
+# **Elements to Focus On**
+
+
+# **Presentation Medium**
+
+You can use any slide-presentation tool you wish. You will just need to provide me with:
+* a printed version of the slide deck for class time and
+* an electronic pdf of the slide deck before or after the presentation.
+
+
+# **Stakeholders**
+
+Identify the stakeholders for your project. For example, include you liaison, professor, athletic director, college, etc. for whom the final work will be submitted.  
+
+
+
+# **Evaluation and Generalized Rubric**
+
+More detail will be added here similar to the **Midterm Presentation**.
+
+-   Quality of project deliverable documents (e.g., organization, coherence, story, coding clarity/organization, plots, etc.)
+-   Professionalism (e.g., liaison meeting etiquette and responsibility, timely discord communication, non-tardy attendance at weekly team meeting, weekly worklogs, feedback from liaison, etc.)
+-   Peer evaluation (e.g., contributions, team player, etc.)
+
+Note: Liaison's will also participate in evaluating all teams. The team with the most impressive project (e.g., most clear, most useful and actionable, most interesting, most thought provoking, etc.) will receive bonus points.
+
+
+# **Presentation Tips**
+
+May be moved to a new sidebar link due to redundancy with Midterm Presentation.

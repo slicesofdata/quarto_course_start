@@ -1,0 +1,133 @@
+---
+title: "**Importing many delimited files into a single data frame**"
+author: "Gabriel I. Cook"
+#date: "`r Sys.Date()`"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+
+execute:
+  enabled: true
+---
+
+```{r}
+#| label: load-packages
+#| include: false
+```
+
+
+## **Libraries** 
+
+- **{here}**: `r packageVersion("here")`: for path management
+- **{dplyr}** `r packageVersion("dplyr")`: for selecting, filtering, and mutating
+- **{magrittr}** `r packageVersion("magrittr")`: for code clarity and piping data frame objects
+- **{vroom}**: `r packageVersion("vroom")`: for reading many files
+
+
+```{r}
+library(magrittr)
+```
+
+# **Finding Data Files**
+
+The goal of this module is provide some solutions to reading in many data files. to find all the files we want to put in a data frame. You could certainly type all the names and put them into a vector but that would be tedious and if you misspelled anything, you would have to troubleshoot an error. 
+
+A solution for this pesky problem is to:
+
+1. obtain a list of all files (a vector with file names as elements)
+2. filter down that list to include only the relevant files 
+3. and combine them all
+
+First, use `list.files()` to list all files in a particular directory. If you do not define any argument, the function will return files and directories in a the working directory, which you know by now should be your project directory. Passing a directory to `path` (the first argument) will return files and directories in that path. If you pass an argument to `pattern`, you will get returned files and directories that contain that string in their name. 
+
+We will look for `.csv` files and assign them to an object. 
+
+```{r}
+csv_files <- list.files(here::here("data", "tfrrs"), pattern = ".csv")
+```
+
+`list.files()` returns an alphabetized character vector. Because there are many files, there are many elements in the vector. We can take a look at elements 1 through 10 using bracket notation `[]` on the vector.  
+
+```{r}
+csv_files[1:10]
+```
+
+Looking at the naming convention, you will see files are named by year and school and team and location and event. Underscores separate the names. You might wish to find all files containing another pattern. Modifying the pattern will change the returned file names.
+
+```{r}
+csv_files <- list.files(here::here("data", "tfrrs"), pattern = "_100.csv")
+
+
+csv_files[1:10]
+```
+
+
+# **Combining Data Files For Specific Events**
+
+The tfrrs data are not all that clean. You can use the logic provided below to:
+
+1. Get files by pattern match for a particular event.
+2. Read them and combine them into a single data frame
+3. Write out that event uber event data frame.
+4. Combine these event .csv's to an uber data frame
+4. Write out the uber data frame (use `saveRDS()` if you make any changes to variable type (e.g., factor))
+
+The more events you can put in a single data frame, the easier your plotting will be in **{ggplot}** but remember you can also pass separate data frames at the `geom_*()` layer. That said, combining as much as you can might be most helpful. I would recommend dealing first with the field events before dealing with the track events because of the time variable.
+
+
+## **Get the File Names by Pattern**
+
+Looking at the pattern of file names for field events, you see .csv file names containing patterns like "DT", "HT", "JT", "LJ", "PV", "LJ", "SP", and "TJ". Double check that you have all event name types. I would also recommend keeping events measured on a time scale separate from a distance scale. 
+
+I will demonstrate the process with two field events. You can apply the logic for all events. We will use `vroom::vroom()` to take the file names (full names mind you), open them all up and combine them into a single data frame.
+
+Let's start with field events like discus:
+
+We will use some [regular expressions](https://www.regular-expressions.info/), or regex, to help us. Because the data are named by year, we can limit the search to files that contain a 4-digit year `\\d{4}` so that you don't also match any aggregated uber files that do not contain a year. Then, the dot star `.*` will help with filler patterns. In particular, `.` refers to any character (e.g,. digit, alpha character, or any other special character) and `*` means zero or more times, so this pattern will search for all files that start with 4 digits followed by anything in the name. Then, the `_HT.csv` pattern will restrict the search to files containing that exact character string. All together, you have a search for `pattern = "\\d{4}.*_DT.csv"`. This will not return the file without the year.
+
+```{r}
+DT <- list.files(here::here("data", "tfrrs"), 
+           pattern = "\\d{4}.*_DT.csv",
+           ignore.case = T,
+           full.names = T
+           ) %>% 
+  vroom::vroom(.)
+
+saveRDS(DT, here::here("data", "tfrrs", "DT.Rds"))
+```
+
+
+Now how about hammer:
+
+```{r}
+HT <- list.files(here::here("data", "tfrrs"), 
+           pattern = "\\d{4}.*_HT.csv",
+           full.names = T
+           ) %>% 
+  vroom::vroom(.)
+
+saveRDS(HT, here::here("data", "tfrrs", "HT.Rds"))
+```
+
+
+## **Get the Event Files and Combine**
+
+For some events, the columns may differ, so you might get an error. If you review the names of columns and locate the pesky `dplyr::select()` columns that you do want. If you have not removed the data frame objects just pass those to `dplyr::bind_rows()`, which will add the rows of the second data frame below the first data frame so that you have a single data frame.
+ 
+```{r}
+FIELD <- dplyr::bind_rows(DT, HT)
+```
+
+## **Save Data**
+
+And then combine and write to an uber field event `.csv` or `.Rds` file. 
+ 
+```{r}
+saveRDS(FIELD, here::here("data", "tfrrs", "TFRRS_FIELD.Rds"))
+```
+
+
+# **Session Information**
+
+```{r}
+sessionInfo()
+```
+

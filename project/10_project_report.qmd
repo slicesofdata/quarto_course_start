@@ -1,0 +1,204 @@
+---
+title: "**Final report**"
+author: "Gabriel I. Cook"
+#date: "`r Sys.Date()`"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+
+execute:
+  enabled: true
+
+#header-includes:
+#  - \usepackage{caption}
+#  - \usepackage{fancyhdr}
+#  - \usepackage{graphicx}
+#  - \usepackage{enumitem}
+#  - \usepackage{hyperref}
+---
+
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+#https://www.projectpro.io/article/data-science-project-report/620
+```
+
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+# some settings for figures in R Markdown - see also Wilke
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path="figs/",
+                      echo=TRUE, warning=FALSE, message=FALSE
+                      )
+
+#
+#---
+#title: "Untitled"
+#author: "Author Person"
+#date: "November 26, 2018"
+#output: 
+#  pdf_document: 
+#    keep_tex: yes
+#---
+```
+
+
+
+# **Overview**
+
+The final written report for the project will be delivered to me and to your liaison. I can provide a color-printed copy for you to distribute to the liaison and for their offices.
+
+The final report is to be created in R Markdown and knit as a Pdf or Word document. An example starter file will be provided in the project repository.  When working with a report file on GitHub, I recommend that you first pull down the fill from the repo, then add your content, push the changed file to the repo, and then close your file. If you leave the file open in RStudio and you pull down the changes made by your peers, you will wan to ensure that you reload/refresh the file so that when you push the changed file, it contains the previous changes. 
+
+If someone is familiar with LaTeX coding, [Overleaf.com](https://www.overleaf.com/) provides a way for collaborating without having to pull and push from GitHub.
+
+# **Sections of Final Report**
+
+- Title Page (page1)
+- Abstract (page 2)
+- Table of Contents (page 3)
+- Acknowledgments (page 4)
+- Introduction (approximately 1-2 pages)
+- Data (approximately 1-2 pages)
+- Results/Findings (approximately 8-10 pages including visualizations)
+- Discussion (approximately 1/2 to 1 pages)
+- Conclusion (approximately 1/2 of page)
+- References (last page)
+
+
+## **Abstract**
+
+The abstract provides a main summary of data, problem, methods, and key findings. 
+
+# **Acknowledgments**
+
+People to acknowledge for the project. Certainly acknowledge the liaisons, the organization for whom the liaison represents, CMS Athletics, the college you represent for the opportunity, etc.
+
+
+## **Contents**
+
+A contents pages, or table of contents, provides a listing of the document sections and subsections as we as a page for location.   
+
+- Title Page
+- Abstract
+- Table of Contents
+- Acknowledgments
+
+Chapters:
+
+- Introduction
+- Data
+- Results/Findings
+- Discussion 
+- Conclusion 
+- References
+
+# **Table of Contents**
+
+Insert a table of contents for the chapters and sections.
+
+
+# **Chapter 1: Introduction**
+
+This chapter would be approximately 1 to 2 single-spaced pages. Here, you will describe both the organization and the project. Respectfully, start with the organization for whom you are completing the work and only after discuss the project. 
+
+Some key details to address include:
+
+- *Client Context:* Provide an overview of the client's business and emphasize how data visualization will assist in addressing their challenges or needs. Who are they? What do they do? What is their relevance/importance?  
+
+- *Project Description*: Next, provide a description of the problem that you worked out with your liaison. Make sure that the problem is stated clearly and is detailed enough to be evaluated and replicated. Why is the problem important to address? Clearly define the project's goals, emphasizing the utilization of data visualization techniques to extract insights and patterns from the data.
+
+- *Scope*: The project scope defines the boundaries, objectives, deliverables, and tasks that need to be accomplished to successfully complete a project. The scope helps define what content will and will not be included in the project. Detail the project's boundaries, specifically highlighting the use of data visualization methods for analysis and understanding.
+
+- *Methodology and Approach*: After describing the nature of the problem, explain how you set out to address the problem. Explain the key sporting event of interest, time period of interest, athletes of interest, etc. Explain the variables of interest used to help answer problem. If the problem was broken down into smaller parts or sub-goals, describe them in the order you plan to discuss the data in the data chapter.What are the means by which you are solving the problem. For this project, you are not fitting mathematical models to data but focusing on visualizing data to communicate your findings in a descriptive sense so make sure you are clear about this detail. 
+
+- *Tools and Techniques*: Highlight the specific visualization tools, software, or libraries used and explain their relevance in uncovering insights from the data.
+
+
+# **Chapter 2: Data**
+
+This chapter would be approximately 1 or 2 single-spaced pages. In this section, you would provide a description of the data, its source, format, etc.  
+
+## **Sources of Data**
+
+What was the data source/where did you obtain it from? Include the source URL of the website from which you accessed the data.The data were obtained from https://www.tfrrs.org/. Include information about where and how the data were collected or obtained. Specify whether the data were obtained from internal databases, external sources, or gathered through specific methods (surveys, sensors, web scraping, etc.). 
+
+## **Data Characteristics**
+
+Discuss the data in detail. In which format was the data stored? How many cases were there in total? How many variables were contained? What variables were contained? What were the key variables you used? 
+
+Describe the types of variables present in the data set (numerical, categorical, text, etc.). When discussing variables of the visualization in the results chapter, make sure to provide clarity about the variable, its metric, and reason for using that variable (e.g., mean, max, median, mean of max values, median of max values, dispersion measures, etc.).  
+
+List and briefly describe each attribute, feature, or variable in the data set, paying special attention to those used for the project. 
+
+
+## **Data Quality and Data Preprocessing**
+
+Describe the steps taken to clean and prepare the data for investigation. This description may include removing duplicates, standardizing formats, trimming, correcting inconsistencies, etc. Explain any criteria used to select variables or features for visualization, focusing on those with the greatest impact or insight for the organization's understanding.
+
+Some key details to address include:
+
+- *Missing Values*: Explain the presence and treatment of any missing data. Explain how missing values were handled during analysis (removal, replacement, etc.).
+
+- *Outliers and Anomalies*: Mention any identified outliers or anomalies and how they were addressed (treatment or exclusion).
+
+- *Variables Created*: Describe the variables created, their units of measurement, etc. Explain if any normalization or scaling procedures applied to create the variables and to ensure data consistency and comparability across measures.
+
+Also, specify where the cleaned data may be obtained. 
+
+
+## **Data Limitations**
+
+Highlight any limitations or constraints of the data set that affected the team's ability to address the initial problem. Similarly, describe how any limitations might affect the interpretation of the findings.
+
+
+# **Chapter 3: Results/Findings**
+
+This chapter would be approximately 8 or 10 single-spaced pages, including data visualizations. In this section, you will tell your story about what you have discovered in the data, making sure that the findings are relevant to the project description/proposal. You will summarize the insights and patterns discovered through data visualization, emphasizing key visual representations that reveal significant information. Your goal is to communicate relevant patterns, trends, relationships or or anomalies within the data set.
+
+This section should be organized logically for telling your story about data. Consider the parts of the story and how to organize those sections appropriately. The organizational structure can be based on importance, hierarchy, impact, etc. To address this organization issue, first, outline your subsections. Second, outline the written and visual content relevant for each subsection. If some findings depend on other findings, unpack the subsections in an order that facilitates understanding. Similarly, do so within sections. Construct the message and then discuss ways to organize more effectively to: (1) state the facts; (2) build up a hierarchy of elements (e.g., athletes to teams; meets in a season, quarters in a season, season within career); (3) break down elements (e.g., teams to athletes; years, quarters or seasons, meets in season); (4) address from least controllable aspects to most controllable aspects (e.g., admission, coaching strategies, etc.); (5) create excitement with rising tension or significance. In other words, this section's organization should serve a purpose but the organization is up to you. You should not just present the data in an order based on order of authorship. Related to authorship, consider a way to organize authors. You may even wish to explain why the order what chosen as some people may infer something from the order. 
+
+Create subsections where relevant. For each section, introduce the topic or problem and then unpack it.
+
+Example:
+
+3.1 Topic/Question A
+
+Introduce the topic or question of interest. Describe the data used to answer this question. Be clear about the metrics used and why those metrics were chosen to answer the question. For example, why the mean? Why the max? Why the median? Why a z-score? If the story involves a comparison of metrics, explain why they are needed and then determine the order to present them. Although the data visualizations should be able to stand along, provide some description of it and direct your audience to particular comparisons or areas of importance within that description. Make reference to the figure (the data visualization) in this text. Insert data visualizations at appropriate locations (trying to ensure that a visualization is referenced and appears on the same page).
+
+When discussing the visualization, organize sentences such that the predictor precedes the outcome variable as the outcome is contingent on the other variables anyway; order in terms of cause and then effect. Interpret data in terms of the direction of comparisons. Do not state that there appears to be a "difference" when that difference is due to an ordering of data. Just describe the finding in terms of the direction of the data.  Don't make your reader work more than necessary. Write using the active voice. Avoid the passive voice and remove references to "it", "this", "these", etc. that otherwise provide ambiguity to the reader trying to resolve the sentence. "It has been shown" lacks clarity. What does "it" refer to? Sure, the reader may be able to infer what you mean if there is only one noun in the previous sentence. Your writing, however, should not require them to work harder than you did when you wrote the sentence; just state the reference "the increase in variable x ...".  Don't make your audience guess what you mean and potentially infer erroneously. Such errors are a consequence of your lack of clarity, not the consequence of them interpreting incorrectly. To avoid these errors, read you work aloud after sufficient distraction or have peers who don't understand the project read your writing aloud and see where they stumble or where they are unable to explain what you are talking about. 
+Make sure that your figures have titles, captions, a reference to your social profile and the course PSYC167: Data Visualization. The data source may not necessary if you explain this in the report but if the image is placed elsewhere, like on the Internet, then having the source would also be relevant in the caption.
+
+3.2 Topic/Question B
+
+3.3 Topic/Question C
+
+3.4 Topic/Question D
+
+If you have exploratory findings that are worth sharing that are beyond the scope of the main project goal, you can add then in a sub-section. 
+
+
+# **Chapter 4: Discussion**
+
+This chapter would be approximately .5 or 1 single-spaced page. In this section, remind the audience of the problem that the project set out to address and the approach by which you addressed it. The previous section on research findings provided a description of the findings. In this section, you explain those findings more broadly and explain how they may relate to the entire problem. 
+
+
+# **Chapter 5: Conclusion**
+
+This chapter would be approximately .5 to 2 single-spaced pages.
+
+Your project report should contain some messaging of a conclusion which summarizes the results you have discovered. Recap the main achievements and the value derived from the use of data visualization in understanding the data. Highlight the most significant visual findings or insights that hold relevance and importance for the client. Propose potential actions or strategies based on the insights obtained through data visualization for further exploration or implementation. The conclusion should provide some action for moving forward. What should your client, organization, or liaison consider moving forward? Should they focus on further development of their current trajectory or direction? Should they consider aspects that have been ignored or that that differ from current current trajectory or direction? Should the organization consider whether to triage or abort some program, direction, venture, or experiment? Consider discussing other methods, statistical perhaps, to further address the problem in the future. When doing so, however, make sure to explain why those statistical methods are relevant and what they might inform.
+
+
+# **Chapter 5: Challenges and Limitations**
+
+Present any important challenges or limitation in this optional section. Discuss any limitations or challenges encountered during the project that may affect the interpretation or application of the findings. Propose potential ways to address or mitigate these limitations in the future.
+
+# **Appendix**
+
+If necessary.
+
+# **References**
+
+A list of references.
+
+
+
+

@@ -1,0 +1,198 @@
+---
+title: "**Midterm presentation**"
+author: "Gabriel I. Cook"
+#date: "`r Sys.Date()`"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+
+execute:
+  enabled: true
+---
+
+
+```{r}
+#| label: load-packages
+#| include: false
+
+
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Overview**
+
+After having several weeks to investigate and examine your data, brainstorm potential key items to address, identify potential story lines, and create some data visualizations, the next step is to present to the class. You goal for the midterm presentation will be to present and discuss data visualizations, or variants thereof, that could find their way into the end-of-semester final presentation and report deliverable. 
+
+You will be evaluated on you and your team's ability to convey the steps taken to clean up the data in service of creating some plots as well as share a decision-making journey of plot creation. Any variables that needed to be fixed or modified, factorized, computed anew, or summarized in some way can resulted in one single starting data frame/tibble and likely some smaller data summaries. Teams taking different approaches, or who are guided by liaisons who have different interests, will end up with different data, different data visualizations, and different stories. Include code where appropriate to communicate how you achieved your goals. 
+
+At this stage in the project, the important point is that all team members should be working with data, challenge themselves to think about data, and practice using **{ggplot}** for creating data visualizations. Thus, **all team members must have two plots**, even if those plots communicate detailed variants of the same performance metric. By plot variants, mean *Same Data, Different Stories*. Variant plots use the same data but are visualized differently in order to facilitate different comparisons, use additional date to provide a more nuanced or detailed interpretation, use different levels/grouping of exiting variables, or use a different scaling structures, etc. Alternatively, the two plots could visualize different metrics obtained from the data, different calculations of a metric, compare different calculations, etc. to represent depths to data inquiry.  
+
+An example of looking at the data in different ways is illustrated in [Nathan Yau's post One Dataset, Visualized 25 Ways ](https://flowingdata.com/2017/01/24/one-dataset-visualized-25-ways/). If you struggle to think about data, you can also check out his post on how to [think like a statistician without the math](https://flowingdata.com/2010/03/04/think-like-a-statistician-without-the-math/). I believe that the most valuable comment is this post to in the *Ask Why* section. He explains that *"...the most important thing I’ve learned, [is to] always ask why. When you see a blip in a graph, you should wonder why it’s there. If you find some correlation, you should think about whether or not it makes any sense. If it does make sense, then cool, but if not, dig deeper. Numbers are great, but you have to remember that when humans are involved, errors are always a possibility."* Asking *why* data are they way they are is important because patterns in data can happen by chance or for some systematic reason. Any systematic influence has to have a reason, an explanation for its presence. Although you may be able to describe a pattern or influence, if you cannot provide an explanation for it, there is no useful way to make that information actionable.      
+
+ 
+
+# **Elements Not to Worry about**
+
+At this point in the semester, you are familiar with creating some out-of-the box staple data visualizations. You are also familiar with some functionality to dress up those visualizations using different aesthetics (whether appropriate or not for any given plot). You also know how to adjust some positioning and scaling elements. There is, however, a lot that of detailing and plot variants that we have not yet addressed. 
+
+You should not worry about the details in modules (like those below) we have not covered and worrying about them will not play a role in evaluation. You should focus on modules we have covered. Focusing on these elements will result in a trade off with addressing other important elements related to the data visualization. decision-making process.
+
+- Uncertainty/Variability 
+- Small multiples and facet plots
+- Legends
+- Titles, subtitles, general axis editing/removal, etc. 
+- Annotation, text, figure captions, etc.
+- Drawing attention to elements, direct labeling, etc.
+- Figure design and themes, making elements more visible/legible, removing labels, changing fonts, etc.
+
+
+# **Elements to Focus On**
+
+## **Data Cleaning and Variable Creation**
+
+You should communicate steps taken to clean data to fulfill sub-goals for different plots. I recommend sharing your code. The audience should understand the code and may have the capacity to identify errors.
+
+### *General Data Cleaning*
+
+* Communicate steps taken to clean data to fulfill sub-goals
+* Communicate how you modified variables and/or computed variables of interest 
+* Communicate any usage of **{dplyr}** functions like `group_by()`, `mutate()`, `filter()`, `ungroup()`, or other functions from **{stringr}**, **{tidyr}** or otherwise for merging/joining, adding new variables, etc.
+
+### *Data Summaries for Plots*
+
+* Communicate how you calculated and/or obtained summary metrics
+* Communicate any usage of functions like `group_by()`, `summarize()`, `filter()`, or `ungroup()` to ensure your data are computed correctly
+
+
+
+## **Data Visualizations: Story Telling with Pictures**
+* Convey performance metrics using data visualizations
+* Walk audience through an explanation of the visualizations
+* Convey why you chose the data to plot and why you chose the plot to convey the data
+* Communicate plot limitations and intended amendments along with reasons why
+
+A plot is chosen as a visual aid for a talk, paper, news article, etc. for various reasons:
+
+* was the only plot created
+* was the only plot known how to create
+* was the best of several plots created
+
+Each data visualization must serve a goal for your audience. You should consider how you intend to talk about the visualization to your audience when you create it. If there are different ways to talk about the same data and more than one variant facilitates that communications, you may consider creating more than one. 
+
+You should stumble upon neither that goal nor the the geom type used to communicate that goal. Are you trying to communicate comparisons of some sort? If so, does the plot make that particular comparison easy? 
+
+
+### *Plot Introduction*
+
+Before revealing your plot, set the stage for its intent. Use words. In your final report, you will be telling a story about the data. You will not just present plots and talk about them. For example, you make introduce a research question that the plot will either help answer or provide information about examining further. After walking the reader through the problem, you will reference a figure containing the plot. For the midterm presentation, you will similarly introduce a question that the plot will help address. Mention the data that the plot visualizes. Are these data minimums, maximums, means, medians, measures of variability, etc. Do the data represent groups of people? Do they include dates? Think of this step as a topic slide before presenting the plot. Your topic title should be brief and clear and you should fill in any more detail with words. This step will set the stage for the audience to understand what data you would be presenting before you throw a plot in their face.
+
+
+### *Plot Reveal and Explanation*
+
+You should make sure that you walk the reader through the data visualization. Be explicit about what the axes represent and what any aesthetics represent so that the audience does not have to figure this out. In other words, do not just present the plot and say "we can see there are differences in metric X across time". Instead, say something more clear like: "This plot visualizes data about Event X for Group/Person/year Y. Along the horizontal axis is... a long the y axis is.... You can see that the average range of times/distances for Event X decreases as athletes' move through class ranks (e.g, FR to SR). This pattern in the data suggests that...". You get the point.
+
+
+### *Plot Discussion*
+
+For each plot you should:
+
+* explain why you selected this plot as the data visualization of choice to communicate the element of data being communicated
+* incorporate information from readings about why you have chosen this plot type
+* explain what modifications you made to the plot (feel free to share code)
+* explain limitations that the plot contains
+* share your future goals to:
+   + replace the plot with a completely new plot for reason X
+   + modify it in one or various ways to solve limitation X, Y, and X
+   + leave plot as is/explain why the plot needs no work
+
+
+
+# **Presentation Medium**
+
+You can use any slide-presentation tool you wish. You will just need to provide me with:
+* a printed version of the slide deck for class time and
+* an electronic pdf of the slide deck before or after the presentation.
+
+# **Stakeholders**
+
+Identify the stakeholders for your project. For example, include you liaison, professor, athletic director, college, etc. for whom the final work will be submitted.  
+
+
+
+# **Evaluation and Generalized Rubric**
+
+## *Data Cleaning and Variable Creation (30 pts)*
+
+* Communicate steps taken to clean data to fulfill sub-goals
+* Communicate how you modified variables and/or computed variables of interest 
+* Communicate any usage of functions to ensure your data are computed correctly
+* Communicate any aggregation methods and summary data frames per plot
+
+
+## *Data Visualizations: Story Telling with Pictures (40 pts)*
+
+* *Plot Introduction (5 pts)*
+* *Plot Reveal and Explanation (20 pts)*
+* *Plot Discussion (15 pts)*
+
+## *Presentation Characteristics (20 pts)*
+
+* *Clarity (5pts)*: well-explained; easy to follow/understand; ability to communicate points effectively
+* *Organization (5pts)*: structured logically; ability to walk audience through some story line or the a story about plot decision processes
+* *Thoroughness (5pts)*: all relevant issues discussed thoroughly
+* *Presentation Style (5pts)*: degree of preparedness and polish in presentation; smooth and rehearsed; minimum of reading; well-paced; slide quality
+
+
+## *Team and Team Member Evaluation (5 pts)*
+
+* Evaluation of personal contributions toward the project as evaluated by other team members (claims partially validated using on-time weekly report submissions). 
+* The audience (your client) will also provide an overall review for the team and individual team members.  
+
+
+## *Self Evaluation (5 pts)*
+
+Evaluation of your personal contributions toward the project as evaluated by yourself (claims partially validated using on-time weekly report submissions).
+
+
+
+```{r eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+## *Weekly Progress Report Logs*
+
+#Demonstration of weekly goals and progress. Timeliness and submission of weekly report logs.
+
+```
+
+# **Presentation Tips**
+
+* *Dress*: You should dress appropriately for a talk. You do not need to dress up but you also should not wear clothing with words, logos, etc. that the audience would read or be distracted seeing.
+
+* *Team members and order*. You you should create your presentation so that team members have duties or goals. Consider strengths, accomplished tasks, etc. If two team members are presenting plots on metric X, have consider grouping them together rather than in some other arbitrary order. 
+
+* *Communication* You should practice your presentation as a team to understand the timing, passing off of the microphone (the same holds if there is not physical mic), etc. Team members should be introduced on first instance of the mic pass off (include 3 things: their name, team role, and what they will talk about, and then pass the mic). Practice will ensure you know who is speaking, in what order, and about what. Lining up in order of speaking also reduces confusion and facilities mic passing. Practice also ensures that you know what you are presenting. You don't have to read what your slide says. When you don't practice, you end up reading, so practice. Lack of practice is typically apparent. 
+
+   + Speak to your audience. Look them in the eyes, tell them about the journey. In other words, don’t just
+read from your slides.
+
+   + Do not overwhelm your audience with too much information, especially verbal information. Doing so
+causes people to read your slides or look at slide content you are not talking about at the moment. You
+are the presenter and your slides are your visual aides used to support what you communicate.
+
+     a. Present slides topically; do not mix unrelated content; use relevant headers, etc.
+
+     b. Present summary points rather than full sentence content. Communicate in sentences but don’t present
+complete sentences on slides unless imperative for communicating a specific point.
+
+     c. Present each point separately. Do no present all slide content (e.g., points a, b, c) communicating
+specific points (e.g., a). Doing so prevents your audience from paying attention to you; causes cognitive
+interference.
+
+     d. Use a tool (e.g., pointer, finger, etc.) to direct attention to necessary elements of slides, especially when
+a slide contains multiple pieces of information. Doing so will reduce unnecessary confusion from some audience members because they will not be looking at the incorrect content.
+
+     e. Introduce team members, their role, etc. when passing the the mic. Your audience/client should be reminded of who the team member is and what their role was.
+
+     f. Do not include a "Thank you" slide. Instead, make a summary slide for your audience to order to remind them of questions they had or to serve as a basis for formulating questions. 
+
+ 
+

@@ -1,0 +1,1011 @@
+---
+title: "**Data subsets and summaries**"
+author: "Gabriel I. Cook"
+#date: "`r Sys.Date()`"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+
+execute:
+  #enabled: false
+  freeze: auto
+---
+
+::: callout-important
+## Under construction. 
+
+This page is a work in progress and may contain areas that need more detail or that required syntactical, grammatical, and typographical changes. If you find some part requiring some editing, please let me know so I can fix it for you.
+
+:::
+
+```{r}
+#| label: load-packages
+#| include: false
+
+#library()
+#library()
+```
+
+# **Overview**
+
+This module demonstrates how to use **{dplyr}** to subset data, mutate variables, and summarize variables in data frames. Many data summaries involve creating group-level statistics so we will also cover grouping across variables. **{lubridate}** will be used to handle time vectors.
+
+
+# **To Do**
+
+## **Readings**
+
+
+## **Task**
+
+
+## **Libraries** 
+
+- **{here}**: `r packageVersion("here")`: for path management
+- **{dplyr}** `r packageVersion("dplyr")`: for selecting, filtering, and mutating
+- **{magrittr}** `r packageVersion("magrittr")`: for code clarity and piping data frame objects
+- **{lubridate}** `r packageVersion("lubridate")`: for handling date and time vectors
+
+
+## **External Functions**
+
+Provided in class:
+
+`view_html()`: for viewing data frames in html format, from `/r/my_functions.R` 
+
+You can use this in your own workspace but I am having a challenge rendering this of the website, so I'll default to `print()` on occasion.
+
+```{r}
+source(here::here("r", "my_functions.R"))
+```
+
+## **Libraries**
+
+We will work with a few different libraries for data manipulation. Let's load them into our work space using `library()`.
+
+```{r}
+library(magrittr)
+library(dplyr)
+library(stringr)
+library(lubridate)
+```
+
+
+# **Loading and Looking at Data**
+
+In order to perform any data summary, you need data. We will use the file name `"cms-top-all-time-2023-swim.xlsx"` that is located at a URL. We could just access the file from the full URL path but we will later want to same a *cleaned* version of the file for later use. Modifying the file name will be easier than hard coding the path in both places. Thus, we will use `paste()` to concatenate the file name and the URL location while also passing the `sep = ""` argument to make sure there is no space (an empty string) between the two strings. By default, `paste()` uses `sep = " "`, which you can see contains a string with a space. We will then pass that concatenated string to `openxlsx::read.xlsx()` and assign the returned data frame to an object named `DAT`.
+
+```{r}
+file_name <- "cms-top-all-time-2023-swim.xlsx"
+base_url <- "https://github.com/slicesofdata/dataviz23/raw/main/data/"
+```
+
+Look to make sure there are not any odd spacing. 
+
+```{r}
+paste(base_url, file_name, sep = "")
+```
+
+
+We will  pass this string to the `xlxsFile` argument and also pass `sheet = "swim"` so the swim worksheet is read from the file.
+
+```{r}
+DAT <- openxlsx::read.xlsx(
+  xlsxFile = paste(base_url, file_name, sep = ""), 
+  sheet = "swim"
+  )
+```
+
+View its contents:
+
+```{r}
+head(DAT) 
+
+#view_html(DAT)
+```
+
+We have several variables: `r names(DAT)`. Some appear to be numeric and some are characters. Passing the data frame to `dplyr::glimpse()` will provide more detail (see also `str()`). 
+
+```{r}
+dplyr::glimpse(DAT)
+
+# or DAT %>% dplyr::glimpse()
+```
+
+Hmm, looks like there are `<chr>` and `<dbl>` variables and some numbers are in quotes. Objects in quotes are strings. So we need to clean up the file before we can even get a summary. Other than looking at the structure of data frame using `glimpse()` or `str()`, you can examine vectors individually. 
+
+When vectors are in data frames, you can reference them using the `$` notation: `my_dataframe$my_variable`. Passing this to `is.numeric()` will also tell you whether the vector is numeric by returning either `TRUE` or `FALSE`.  
+
+```{r}
+is.numeric(DAT$time)
+```
+
+OK, so this variable is definitely not numeric. Looking at the file, we need to convert at least one variable that should be numbers from character to numeric. 
+
+
+# **Modifying a Data Frame or Tibble Using {dplyr}**
+
+Use `dplyr::mutate()` to create, modify, and delete column variables. At every least, you will need to pass a data frame as the first argument, `.data` and then a name-value pair as the second argument. There are other arguments that are experimental which will not be the focus of this module. 
+
+```
+mutate(
+  .data,
+  ...,
+  .by = NULL,
+  .keep = c("all", "used", "unused", "none"),
+  .before = NULL,
+  .after = NULL
+)
+```
+
+We will use `mutate()` in conjunction with **{magrittr}**'s `%>%` for code piping.
+
+
+## **Creating a new variable**
+
+We will pass the data frame into `mutate()` and then specify a name-value variable pair. When using `%>%`, the data frame piped into the function will be represented as `.`. This `.` is not needed but serves as a good reminder that the data frame that is passed into `mutate()` is from the previous line of code. In order to keep the print out manageable, we will also use the `slice()` function.
+
+```
+mutate(data_frame, 
+    new_variable_name = variable
+    )
+```
+
+Create new variables that are set to a constant number or string:
+
+```{r}
+DAT %>%
+  slice(., 1:5) %>%   # rows 1 through 5
+  mutate(., newvar1 = 9999) %>%
+  mutate(., newvar2 = "Student") 
+```
+
+You can see that each row in the data frame will take on the paired value. 
+
+
+## **Modifying a new variable**
+
+New variables are modified using the same name-value pairing approach. When you modify a variable, you are taking an existing variable to setting it to another value. 
+
+### *Set an existing variable equal to a constant*
+
+Just use an existing variable name (left of `=` in name-value pair).
+
+```{r}
+DAT %>%
+  slice(., 1:5) %>%   # rows 1 through 5
+  mutate(., time = 1) %>%
+  mutate(., name = "0") 
+```
+
+OK, that's not very helpful. We just replaced our existing variables with nothing useful. You can see that name is still a `<chr>` type.
+
+
+### *Set an existing variable equal to another value*
+
+As long as **{dplyr}** can result the character elements of the vector, `as.numeric()` will convert the character strings to numbers. For example: 
+
+```{r}
+as.numeric(c("1", "3.2", "6.99"))
+```
+
+We can illustrate in a data frame by creating character value that will serve as the constant, and use `as.numeric()` just to illustrate this example.
+
+```{r}
+DAT %>%
+  slice(., 1:5) %>%   # rows 1 through 5
+  mutate(., name = as.numeric("0")) 
+```
+
+And now `name` is a `<dbl>`, which is a type of numeric. We can see this by selecting columns from the data frame `where()` the variable `is.numeric()`.
+
+```{r}
+DAT %>%
+  slice(., 1:5) %>%   # rows 1 through 5
+  mutate(., name = as.numeric("0")) %>%
+  select(., where(~is.numeric(.)))
+```
+
+But if we try to convert `time` to numeric this way, you will see that the complex numbers will be converted to `NA`s, or missing.
+
+```{r}
+as.numeric(DAT$time)
+```
+
+The problem we have is that the data are not in a clean form. In this data frame, some elements of `time` are composed of numbers, decimals, and colons (e.g., x.xx, xx:xx.xx, etc.). which all make up elements that would be numbers. 
+
+
+### **Converting variables that are time related using {lubridate}**
+
+**{lubridate}** is a library for dealing with dates and times. It is also part of the **tidyverse}** ecosystem. 
+
+The `period_to_seconds()` function will convert periods to seconds depending on the period format. We need to pass to it an object that equates to a period of seconds.
+
+For `time`, the format is: hour minute second (e.g., `hms`). And there is a `hms()` function to handle this. Let's see how it works before modifying the data frame. Load the library if it is not loaded. 
+
+We will pass a single character string and convert it to `hms` with `hms()` and then convert that to seconds using `period_to_seconds()`. Because 60 minutes and 1 hour is the same number of seconds, we should end up with the same values. We can also use `ms()` to convert the format into minutes and seconds and pass to `period_to_seconds()`. Following the examples, we will apply to the vector in the data frame.
+
+```
+lubridate::period_to_seconds(lubridate::ms())
+lubridate::period_to_seconds(lubridate::hms())
+```
+
+Sixty minutes and one hour to `hms`:
+
+```{r}
+lubridate::hms("00:60:00")
+lubridate::hms("01:00:00")
+```
+
+One day to `hms`:
+
+```{r}
+hms("24:00:00")
+```
+
+
+Sixty minutes and one hour to `hms` to seconds:
+
+```{r}
+lubridate::period_to_seconds(lubridate::hms("00:60:00"))
+lubridate::period_to_seconds(lubridate::hms("01:00:00"))
+```
+
+OK, good. So let's see if we can convert `time`. Because `hms()` is passed into `period_to_seconds()`, we first need to verify that `hms()` can handle it.
+
+```{r}
+hms(DAT$time)
+```
+
+Yikes! Note the warning and look at the output. Some strings failed and turned to `NA`. Looking and the `time` vector again, we see that contains both values like `1:52.83` and `23.87`. If there is only one `:`, we should be able to use `ms()`. 
+
+```{r}
+ms(DAT$time)
+```
+
+Great! All elements are in the form of `"xxM XXs"`. But does **{lubridate}** also convert seconds to a numeric value when using `period_to_seconds()`? If loaded, we can also remove the name of the library when calling the functions.
+
+```{r}
+is.numeric(period_to_seconds(ms(DAT$time)))
+```
+
+So let's go ahead and modify the character vector named `time` to a numeric vector representing seconds. 
+
+```{r}
+period_to_seconds(ms(DAT$time))
+```
+
+Perfect! Let's `mutate()` that variable in the data frame.
+
+```{r}
+DAT %>%
+  slice(., 1:5) %>%   # rows 1 through 5
+  mutate(., time = period_to_seconds(ms(time)))  
+```
+
+Let's look at `DAT` now and see those seconds. You can look at the entire data frame if you wish rather than its `head()`.
+
+```{r}
+head(DAT)
+```
+
+The data frame has not changed. The final step is to assign assign the returned data frame to an object. Remove the `slice()` so we get the entire data frame.
+
+```{r}
+DAT <- DAT %>%
+  mutate(., time = period_to_seconds(ms(time)))  
+```
+
+
+Now let's write this to `/data`. But we don't want to overwrite this file. **{here}** won't be as effective but we can concatenate the `file_name` string object with a prefix like `"cleaned"` using the `paste()` function in `base R`. We will add a hyphen, `-`, by passing it to the `sep` argument. 
+
+```{r}
+paste("cleaned", file_name, sep = "-")
+```
+
+When paired with `here::here()`, does the full file path look right?
+
+```{r}
+here::here("data", paste("cleaned", file_name, sep = "-"))
+```
+
+We also want to write a `.csv` file. Let's use `gsub()` to look or the string pattern `".xlxs"` and replace it with `".csv"` for the file path string.
+
+```{r}
+new_name <- gsub(pattern = ".xlsx", 
+                 replacement = ".csv", 
+                 x = here::here("data", paste("cleaned", file_name, sep = "-"))
+                 )
+```
+
+
+Got our new file name! Let's write!
+
+```{r}
+readr::write_csv(DAT, new_name)
+```
+
+Done!
+
+# **Quick Summary Using `base R`**
+
+If you want a quick summary of data, `summary()` will provide some basic information for you. You can pass a data frame to the function.
+
+```{r}
+summary(DAT)
+```
+
+
+# **Summarizing Data Using {dplyr}**
+
+However, there are many ways to summarize data. To introduce data summary techniques using **{dplyr}**, we will open `DAT` and use `dplyr::summarise()` or `dplyr::summarize()` to summarize the data. The `summarise()` function works similar to `mutate()` insofar as it creates variables but it differs insofar as the data frame returned from `summarise()` contains only the variable(s) referenced in as part of that summary process. This includes some function calls immediately prior to `summarize()`. 
+
+In the example below, we summarize by creating a new variable which is set to represent some data summary technique. In essence, summarizing is for descriptive statistics. Using `mean()`, we can summarize the data by taking the mean of the `time` variable.
+
+```
+summarize(.data, 
+   ..., 
+   .by = NULL, 
+   .groups = NULL
+   )
+```
+
+```{r}
+DAT %>%
+  summarise(., 
+            mean = mean(time, na.rm = T),
+            )
+```
+
+
+Notice what is returned is a single value reflecting the mean of all the data in the data frame. We could have obtained the same without using **{dplyr}**.
+
+```{r}
+mean(DAT$time, na.rm = T)        # $ notation
+```
+
+But we lose flexibility of easily adding new summary procedures. We can summarize by two name-value pair functions.
+
+```{r}
+DAT %>%
+  summarise(., 
+            mean = mean(time, na.rm = T),
+            sd   = sd(time, na.rm = T)
+            )
+```
+
+Now there is a mean and standard deviation for price. You can also add the sample size using `dplyr::n()`. 
+
+```{r}
+DAT %>%
+  summarise(., 
+            mean = mean(time, na.rm = T),
+            sd   = sd(time, na.rm = T),
+            n    = n()
+            )
+```
+
+
+# **Summarizing `across()` Multiple Variables**
+
+Summarizing a single variable is useful but if you want to summarize by many, you likely do not want to code a new line for each variable. In such cases, you can use `across()` as a helper function as was used for creating new variables with `mutate()` (see previous lesson).  
+
+`across()` has three main arguments:
+
+- `.cols`: specifies the columns to summarize across
+- `.fns`: specifies the function(s) for the summary
+- `.names`: specifies the output variable names 
+
+Remember `across()` will want you to pass the columns to summarize by, `.cols`, the function for how to summarize, `.fns`, and the names for how to name the new variables, `.names` (which will be `NULL` by default). The `.x` here stands for passing the vector to the mean function and not the data frame. More on `~` and `.x` later.
+
+## *Summarize across by numeric variables:*
+
+```{r}
+DAT %>%
+  summarise(., across(.cols = where(is.numeric), 
+                      .fns  = ~mean(.x, na.rm = TRUE))
+            )
+```
+
+Well, that's now actually impressive because there is only one numeric variable. What if we had more that were piped to `summarize()`?
+
+```{r}
+DAT %>%
+  mutate(., 
+         num1 = time,
+         num2 = time,
+         num3 = time
+         ) %>%
+  summarise(., across(.cols = where(is.numeric), 
+                      .fns  = ~mean(.x, na.rm = TRUE))
+            )
+```
+
+That was easy.
+
+
+Because `across()` is so powerful, let's just add another variable to the data frame for using in examples. You might also wish to reorder the position of variables in the data frame so that they are grouped in some way. We can use `dplyr::relocate()` to accomplish this. We will move the `time` column to the position `.before` one of the new variables using `relocate(., time, .before = min)`.
+
+Doing so will also show you some ways to create variables. 
+
+```{r}
+DAT <- DAT %>%
+  mutate(., 
+         sec = time,  # will be redundant with time but named accurately
+         min  = time/60,
+         hour = time/(60*60)
+         ) %>%
+  relocate(., time, .before = sec)
+```
+
+Take a look:
+
+```{r}
+head(DAT)
+```
+
+
+Variable names created with `across()` is controlled using the `.names` argument. The default is equivalent to `.names = {.col}`, which means that the name(s) are inherited from the `.cols` argument; the names are a stand-in for the name specification. If you wish to have control over the names, you can pass a string that that either appends  (e.g.,`"{.col}suffix"`) or prepends (e.g.,`"prefix{.col}"`) a string to each column name. This string looks odd because it's a special *glue* specification that glues together with a string with an object. We will use this concept later when using the **{glue}** library. 
+
+When modifying `.names`, include a character like `"_"` (e.g.,`"{.col}_suffix"`) so that the column names and the appended text are separated, making the name easily legible. If you summarize to create means, a good suggestion is something like (e.g.,`"{.col}_mean"` or (e.g.,`"{.col}_mn"`)) so that you know the variable is a mean. If you prefer the function name first, you can use a prefix (e.g.,`"mean_{.col}"`).
+
+
+```{r}
+DAT %>%
+  summarise(., across(.cols = c("sec", "min", "hour"), 
+                      .fns  = ~mean(.x, na.rm = TRUE),
+                      .names = "{.col}_mean"
+                      )
+            )
+
+```
+
+You can see how all variables in the summary end in `"_mean"`.
+
+
+You can also glue the function and the column names together by passing `.names = "{.col}_{.fn}"`. 
+
+```{r}
+DAT %>%
+  summarise(., across(.cols = c("sec", "min", "hour"), 
+                      .fns  = ~mean(.x, na.rm = TRUE),
+                      .names = "{.col}_{.fn}"
+                      )
+            )
+```
+
+You you will see there is a number that is appended to the variable name. This is because there is only one function passed to `.fns`. You can pass more using a special object called a list (see `?list`). Unlike vectors, elements of lists need not be the same kind. Elements of lists can combinations of characters, numbers, data frames, functions, etc.
+
+
+## *Passing multiple functions from a `list()` in `across()`*
+
+Passing functions as a list requires a little fancy coding. We will pass two functions as a `list` so that we can calculate both the `mean()` and the `sd()` on the variables passed to `across()`.  
+
+A `list` is a special object (e.g., container) for which its elements can be different types of objects. Whereas elements of `vectors` can be only character or only numeric, elements of lists can hold different object. One element can be a numeric vector, another element a data frame, another element a character vector, etc. Many functions used in R will actually return lists for which elements contain different types of objects.
+
+OK back to two or more functions. If you pass a `list()` with arguments for the `mean` and the `sd` (e.g., `list(mean, sd)`, you can summarize by both. If you want to prevent errors (yes you do) and want to keep the summaries separate (probably so), you can modify `.names` to pass both the column and the function (e.g., `"{.col}_{.fn}"`). The underscore is not needed here; it only helps with readability of the variables so that you don't end up with variable names like `var1mean` but instead `var1_mean`.
+
+Let's pass the summary procedures as a `list` to include measures of mean and standard deviation for the variables.
+
+```{r}
+DAT %>%
+  summarise(., across(.cols  = c("sec", "min", "hour"), 
+                      .fns   = list(mean, sd),
+                      .names = "{.col}_{.fn}")
+            )
+```
+
+Well those are not exactly the names we want but it illustrates how names are created. Because we have two summary functions for each column variable passed to `across()`, they are enumerated according to the order in the list (e.g., mean then standard deviation).
+
+### *Fixing `.names` when passing lists to `.cols` in `across()`*
+
+Enumeration is not helpful for remembering variable names. There are different ways to do fix this problem, some of which may be better under certain scenarios. You have to determine what approach is best but I'll lay out some limitations. If you pass only the functions into the list, then when you pass `{.fn}` to `.names`, the variable names in the returned data frame will take on a numeric value representing the order/element position of the functions as you entered them in the `list`. In this coding instance, means would be named with`"_1"` and standard deviation names with `"_2"`. This approach, however, leads to confusing variable names because you have to remember which is 1 and which is 2 and of course explain this to anyone with whom you share the data. Let's take a look. 
+
+A better approach could be to assign the `mean` and `sd` functions their own names in the `list()` function call. By doing so, the name is appended and the new variable is named meaningfully. 
+
+Let's modify what we pass to `.fns` by passing a list containing 3 functions (e.g., `mean()`, `sd()`, and `length()`) and give each there name. I know this part is confusing because the `()` are dropped inside the list. This is just how `R` works. Don't blame the messenger.
+
+```{r}
+DAT %>%
+  summarise(., across(.cols = c("sec", "min", "hour"), 
+                      .fns  = list(mean = mean, 
+                                   sd = sd,
+                                   n = length
+                                   ),
+                      .names = "{.col}_{.fn}")
+            )
+```
+
+Importantly, however, certain functions like `mean()` will operate in ways you might not expect. One one hand, it does what we expect when all elements can be used to calculate the mean. 
+
+```{r}
+mean(DAT$time)
+```
+
+On the other hand, if there is a missing value, it does not computer the mean but instead something else. Let's add an `NA` to the vector using `c()` to see what happens.
+
+```{r}
+mean(c(DAT$time, NA))
+```
+
+#### *Understanding `NA`s when passing lists to `.cols` in `across()`*
+
+The `mean()` function returns `NA` rather than a mean. If there is just one `NA`, `mean()` returns `NA`. By design this is actually good. 
+
+Let's also try `sd()` for the standard deviation of a vector:
+
+```{r}
+sd(c(DAT$time, NA))
+```
+
+The median of a vector, `median()`:
+
+```{r}
+median(c(DAT$time, NA))
+```
+
+The length of a vector, `length()`:
+
+```{r}
+length(c(DAT$time, NA))
+```
+
+Well, that's interesting. By default `length()` will return the number of elements of the vector including `NA`s but by default `mean()` will not return the mean of a vector with `NA`s because `na.rm = FALSE` by default. If you wish to calculate the mean by removing the `NA`s, pass `na.rm = TRUE`. 
+
+```{r}
+mean(c(DAT$time, NA), na.rm = T)
+```
+
+Make note, however, that the length of this vector without `NA`s is **shorter** than the length with `NA`s. We can test this hypothesis on a vector with and without the `NA` by using `na.omit()` to omit any of them. Using our vector we added an `NA`, let's omit it.
+
+```{r}
+na.omit(c(DAT$time, NA))
+```
+
+And then get the length when `NA`s are omitted:
+
+```{r}
+length(na.omit(c(DAT$time, NA)))
+```
+
+This behavior is important because if you want to obtain the mean of a variable with `NA`s and the sample size using `length()`, your sample size will be inaccurate.
+
+In order to see these operations on a data frame and in the context of `dplyr::summarize()`, let's modify the data frame to include an additional row with some mission values. One simple approach is to use `base R` to use `rbind()` to bind a new row to the end of the data frame. In this case, the contents of that new row will be the same as the first row of the data frame (e.g., `DAT[1,]`). Then the name will be changed and some values will be made missing.
+
+```{r}
+DAT <- rbind(DAT, 
+             DAT[1,]
+             )
+```
+
+Modify the cells in the data frame using bracket notation from `base R`. When using brackets, the data frame can be referenced using row and column arguments.
+
+Examples:
+
+```
+DAT[]       # all rows and columns
+
+DAT[,]      # all rows and columns (preferred separation with comma)
+
+DAT[1, ]    # row 1, all columns
+
+DAT[,1]     # all rows, column 1
+
+DAT[1:5, "name"]    # rows 1 through 5, "name" column
+
+DAT[, c("name", "year"]    # all rows, "name" and "year" columns
+
+DAT[15, "name"]    # row 15 through 5, "name" column
+```
+
+You can also obtain the dimensions of a data frame using `dim()` from `base R`. 
+
+```{r}
+dim(DAT)
+```
+
+`dim()` returns a vector with two elements: the number of rows and the number of columns. We can use this to reference the last row in the data frame in order to modify it for this example. 
+
+Following from above, examine the last row, change the `"name"` to "Anonymous" and then put `NA`s in the `"sec"` and `"min"` columns for the same row. Remember, vectors are pure characters or numeric, they cannot contain a mixture of them. Because `"name"` is character vector and `"sec"` and `"min"` are numeric vectors, we need to fix them separately. There are other ways to accomplish this goal but this example illustrates the approach in `base R` so that you have some exposure.
+
+```{r}
+DAT[dim(DAT)[1], ]                              # the current row contents
+
+DAT[dim(DAT)[1], "name"] <- "Anonymous"         # make name anonymous
+
+DAT[dim(DAT)[1], c("sec", "min")] <- c(NA, NA)  # set these cells to NA
+```
+
+Are `NA`s across the last row now?
+
+```{r}
+DAT %>% tail()
+```
+
+#### *Comparing some functionality when passing lists to `.cols` in `across()`*
+
+When functions do not contain argument for dealing with `NA`s, there is `na.omit()`, a function that takes an object and removes `NA`s. So you can just pass the variable to `na.omit()` and then wrap it in the metric function of interest. Also, because `na.rm = T` cannot be used for `length()`, `na.omit()` offers consistency across all functions and as a result, I believe, less confusion.
+
+Unfortunately, accomplishing this task can be rather tricky and requires some new syntax. This requires usage of what's called a "lambda" technique. You will want to incorporate `~` and `.x` into your code. The `~` is used to indicate that you are supplying a lambda function and use of `.x` is to indicate where the variable in `across()` is used. Using this type of syntax, we can pass functions to the `.fns` argument that operate across a set of variables. The `?across()` documentation calls this "a **{purrr}**-style lambda" in the arguments section. This approach can be a little bit confusing, so I’m going to show you an example, and then walk through it step by step. You can always create code snippets so you don't have to rely on memory write complicated code like this.
+
+Anyway, we will precede the function with `~` and reference the vector using `.x`. Let's do this and change the `.fns` argument slightly.
+
+Here is a general example:
+
+```
+name = ~function(na.omit(.x))
+```
+
+We will summarize only `time` and `sec` because those variables are identical except for the row we added. We will also add `dplyr::n()` to see what's going on with that function. 
+
+```{r}
+DAT %>%
+  summarise(., across(.cols = c("time", "sec"), 
+                      .fns  = list(mean = ~mean(na.omit(.x)),
+                                   #sd = ~sd(na.omit(.x)),
+                                   len = ~length(na.omit(.x)),
+                                   n = ~dplyr::n()
+                                   ),
+                      .names = "{.col}_{.fn}"
+                      )
+            ) 
+```
+
+So what happened? The means and lengths for `time` and `sec` are not the same. Means differ because they are calculated by different values depending on the presence of `NA`s. But notice that the n's are the same based on `dplyr::n()`. How can the means and differ if the n's are the same?  
+
+So what's the point of all of this? Well, you need to be careful not to apply functions and assume they are doing what you believe you are doing. You always need to be smarter than the code you use. Also, there is no single answer for dealing with data. Sometimes one approach will be appropriate and in other instances another approach will be. You as the data scientist need to know that there are different methods so that you an decide where to apply those different methods. 
+
+
+## **Summarize by Groups Using `group_by()`**
+
+### *Identifying how to group*
+
+When you have subgroups in your data, you will often want to create summary statistics by those group levels. A typical grouping approach is by some categorical or factor variable present in a data frame. Using `glympse()`, we can view all variables to see what might be of interest. 
+
+```{r}
+glimpse(DAT)
+```
+
+Looks like some factor variables we can group by include `name`, `year`, `event`, and `team`.
+
+
+## **Summarize A (one) Specific Variable by Groups Using `group_by()`**
+
+### *A single summary metric*
+
+Perhaps you only want to obtain the `mean()` or the `sum()` or the `sd()` for a variable. If so, this is easiest.
+
+#### *Grouping by one variable*:
+
+The data in `r file_name` contain the top records for swimming events. You might be curious what `year` was the best of all time or what swimmer (e.g., `name`) has attained the most records of all time. There are different ways to accomplish this goal. 
+
+One approach that might be the most straight forward to new programmers is to mutate a constant count variable on each row which can be used to sum the counts for different groups.  
+
+```{r}
+DAT %>%
+  mutate(., count = 1) %>%         # mutate a new variable where all rows get a 1
+  group_by(., name) %>%            # group by the swimmer name
+  summarise(., count = sum(count)) # sum the count and assign it the name count
+```
+
+By default, the data frame is arranged by the grouping variable (e.g., `name`). We can change the order of the rows by `count` using `arrange()` but this function by default sorts in an ascending manner. If you want a descending sorting, pass `count` to `desc()` to arrange the data frame in this way. We can also assign it to an object.
+
+```{r}
+NAME_count <- DAT %>%
+  mutate(., count = 1) %>%
+  group_by(., name) %>%
+  summarise(., count = sum(count)) %>%
+  arrange(., desc(count))
+```
+
+```{r}
+NAME_count
+```
+
+We can see that the top counts of all time are by `r NAME_count[1, "name"]` for a total of `r NAME_count[1, "count"]`. Kudos to `r stringr::str_split_fixed(NAME_count[1, "name"], " ", 2)[1]`!
+
+```{r}
+YEAR_count <- DAT %>%
+  mutate(., count = 1) %>%
+  group_by(., year) %>%
+  summarise(., count = sum(count)) %>%
+  arrange(., desc(count))
+```
+
+```{r}
+YEAR_count
+```
+
+We can see that the year with the most best are by `r YEAR_count[1, "year"]` for a total of `r YEAR_count[1, "count"]`. Hooray for `r stringr::str_split_fixed(YEAR_count[1, "year"], " ", 2)[1]`!
+
+
+#### *Grouping by two or more variables*:
+
+We can also summarize both the teams as well in order to see the top swimmer by team. If you want to summarize more than one variable, pass them both in `group_by()`: 
+
+```{r}
+TEAM_NAME_count <- DAT %>%
+  mutate(., count = 1) %>%
+  group_by(., team, name) %>%
+  summarise(., count = sum(count)) %>%
+  arrange(., desc(count))
+```
+
+```{r}
+TEAM_NAME_count
+```
+
+#### *Filtering rows and then grouping by one variable*:
+
+For Athenas:
+
+```{r}
+ATHENA_NAME_count <- DAT %>%
+  mutate(., count = 1) %>%
+  filter(., team == "Athena") %>%
+  group_by(., name) %>%
+  summarise(., count = sum(count)) %>%
+  arrange(., desc(count))
+```
+
+```{r}
+ATHENA_NAME_count
+```
+We can see that the top counts of all time are by `r ATHENA_NAME_count[1, "name"]` with a total of `r ATHENA_NAME_count[1, "count"]`. Nice work `r stringr::str_split_fixed(ATHENA_NAME_count[1, "name"], " ", 2)[1]`!
+
+
+And for Stags:
+
+```{r}
+STAG_NAME_count <- DAT %>%
+  mutate(., count = 1) %>%
+  filter(., team == "Stag") %>%
+  group_by(., name) %>%
+  summarise(., count = sum(count)) %>%
+  arrange(., desc(count))
+```
+
+```{r}
+STAG_NAME_count
+```
+
+We can see that the top counts of all time are by `r STAG_NAME_count[1, "name"]` with `r STAG_NAME_count[1, "count"]`. Go `r stringr::str_split_fixed(STAG_NAME_count[1, "name"], " ", 2)[1]`!
+
+
+To wrap up this example, sometimes working with separate data frames using `filter()` can provide more useful or manageable summaries.Perhaps you only want to obtain the `mean()` or the `sum()` or the `sd()` for a single variable. If so, this approach may be  easiest.
+
+
+If you are curious, here is a story covering ["How CMS teams became the Stags and Athenas"](https://www.cmc.edu/magazine/fall-2016/how-cms-teams-became-stags-and-athenas).
+
+### *Multiple summary metrics*
+
+Sometimes you need more than one summary statistic, for example, the `mean()` and the `sd()`. This is a little more complex to code.
+
+*Note:* In these code blocks, some arguments may be removed for readability.
+
+#### *Grouping by one variable*:
+
+```{r}
+DAT %>%
+  group_by(., event) %>%
+  summarise(., 
+            sec_mean = mean(sec, na.rm = T),  
+            sec_median = median(sec, na.rm = T)
+            )
+```
+
+We can also write the summary functions as a list inside `across()` along with passing `.names = "{.col}_{.fn}"` if you want the variables named automatically. This approach is more complex but is more flexible.
+
+When you want to summarize across multiple variables using a list of functions, you will want to make sure your `.fns` argument passes a function using a **{purrr}**-style lambda (e.g.,`~`) for that the function is applied across the variables. You will also want to edit `.names = "{.col}_{.fn}"` so that the naming is done automatically rather than hard coding the names.
+
+```{r}
+DAT %>%
+  group_by(., event) %>%
+  summarise(., across(.cols = "sec",
+                      .fns  = list(mean = ~mean(na.omit(.x)),
+                                   median = ~median(na.omit(.x))
+                                   ),
+                      .names = "{.col}_{.fn}"
+                      )
+            ) 
+```
+
+#### *Grouping by two or more variables*:
+
+```{r}
+DAT %>%
+  group_by(., event, team) %>%
+  summarise(., 
+            sec_mean = mean(sec, na.rm = T),  
+            sec_median = median(sec, na.rm = T)
+            )
+```
+
+Or pass the list:
+
+```{r}
+DAT %>%
+  group_by(., event, team) %>%
+  summarise(., across(.cols = "sec",
+                      .fns  = list(mean = ~mean(na.omit(.x)),
+                                   median = ~median(na.omit(.x))
+                                   ),
+                      .names = "{.col}_{.fn}"
+                      )
+            ) 
+```
+
+
+## **Summarizing Multiple Variables by Groups Using `group_by()`**
+
+So far, we have shown how to summarize a single variable either with or without grouping by levels of another variable. Summaries, however, are often done for multiple variables in data frame. For example, you might want to obtain the `mean()` for multiple variables or obtain the `mean()` and the `max()` (or some other summary statistic) for multiple variables. The following examples prepare you for such tasks.
+
+### *A single summary metric*
+
+#### *Grouping by one variable*:
+
+```{r}
+DAT %>%
+  group_by(., event) %>%
+  summarise(., across(.cols = c("sec", "min"),
+                      .fns = ~mean(.x, na.rm = T),
+                      .names = "{.col}_{.fn}"
+                      )
+            ) 
+```
+
+#### *Grouping by two or more variables*:
+
+```{r}
+DAT %>%
+  group_by(., event, team) %>%
+  summarise(., across(.cols = c("sec", "min"),
+                      .fns = ~mean(.x, na.rm = T),
+                      .names = "{.col}_{.fn}"
+                      )
+            ) 
+```
+
+### *Multiple summary metrics*
+
+And if you need to summarize using multiple metrics, then pass the list into `.fns`:
+
+#### *Grouping by one variable*:
+
+```{r}
+DAT %>%
+  group_by(., event) %>%
+  summarise(., across(.cols = c("sec", "min"),
+                      .fns  = list(mean = ~mean(na.omit(.x)),
+                                   median = ~median(na.omit(.x))
+                                   ),
+                      .names = "{.col}_{.fn}"
+                      )
+            ) 
+```
+
+#### *Grouping by two or more variables*:
+
+```{r}
+DAT %>%
+  group_by(., event, team) %>%
+  summarise(., across(.cols = c("sec", "min"),
+                      .fns  = list(mean = ~mean(na.omit(.x)),
+                                   median = ~median(na.omit(.x))
+                                   ),
+                      .names = "{.col}_{.fn}"
+                      )
+            ) 
+```
+
+Depends on the order in `group_by()`, so change the order:
+
+```{r}
+DAT %>%
+  group_by(., team, event) %>%
+  summarise(., across(.cols = "sec",
+                      .fns  = list(mean = ~mean(na.omit(.x)),
+                                   n = ~length(na.omit(.x))
+                                   ),
+                      .names = "{.col}_{.fn}"
+                      )
+            ) 
+```
+
+Notice the change in the order of the column variables. But remember, you can change the order later using `select()` and/or `relocate()`.
+
+
+
+## **Summarizing Multiple Variables With Reference by Name`**
+
+### *Variables that are numeric*
+
+You can also pass variables that are a certain type, like numeric. 
+
+```{r}
+DAT %>%
+  group_by(., team, event) %>%
+  summarise(., across(.cols = where(is.numeric), 
+                      .fns = ~mean(.x, na.rm = TRUE), 
+                      .names = "{.col}")
+            )
+```
+
+### *Variables by pattern match*
+
+This approach is fun, especially if you have already named variables in ways that make selection really useful. This data frame is constrained a bit so the examples may be silly.
+
+
+#### *Using starts_with()*
+
+```{r}
+DAT %>%
+  group_by(., team, event) %>%
+  summarise(., across(.cols = starts_with("t"),
+                      .fns  = list(mean = ~mean(na.omit(.x)),
+                                   n = ~length(na.omit(.x))
+                                   ),
+                      .names = "{.col}_{.fn}"
+                      )
+            ) 
+```
+
+#### *Using `&` for complex selection*
+
+You obviously cannot calculate numeric metrics for character variables. But how might you select variables that contain a certain character pattern but are also numeric? You cannot nest these functions (e.g., `where(is.numeric(contains("pattern")))`). You can, however, pass the functions separately.
+
+```{r}
+DAT %>%
+  group_by(., team, event) %>%
+  summarise(., across(.cols = contains("e") & where(is.numeric),
+                      .fns  = list(mean = ~mean(na.omit(.x)),
+                                   n = ~length(na.omit(.x))
+                                   ),
+                      .names = "{.col}_{.fn}"
+                      )
+            ) 
+```
+
+
+# **Summary**
+
+You can see that summarizing data can be fun, interesting, simple, but sometimes complex. The examples above are only limited to selecting variables by name. Of course, you can `summarize()` `across()` variables that `contain()` characters or that `starts_with()` some characters or even across variables that `is.numeric()` (pardon the grammar) by pairing these functions with the 
+
+
+
+## **A Functional Approach**
+
+You can also throw your summaries into functions if you wish. We will create a new object that is a function object. We need to give it a name and we need to define arguments to make the function operate. We will want to make sure we have numeric variables.
+
+```{r}
+summarizer <- function(data, 
+                       cols = NULL, 
+                       ...
+                       ) {
+  data %>%
+    group_by(...) %>%
+    summarise(., across(.cols = {{cols}} & where(is.numeric),
+                     .fns = list(
+                          mean = ~mean(.x, na.rm = TRUE),
+                          sd   = ~sd(.x, na.rm = TRUE)
+                          ), 
+                     .names = "{col}_{fn}")
+              )
+}
+```
+
+Test the function:
+
+Without grouping:
+
+```{r}
+summarizer(DAT, cols = contains("e"))
+```
+
+With grouping:
+
+```{r}
+summarizer(DAT, cols = c(min, hour), event)
+```
+
+
+And of course, when you really get excited, you could add functions so that you can perform different metrics. When you are done, you can save your favorite function to a file you can `source()`. 
+
